@@ -1,25 +1,21 @@
 {
   "name": "SquareFit",
   "short_name": "SquareFit",
-  "start_url": "./index.html",
-  "scope": "./",
+  "start_url": "/squarefit/index.html",
+  "scope": "/squarefit/",
   "display": "standalone",
   "background_color": "#121212",
   "theme_color": "#121212",
   "icons": [
     {
-      "src": "./icon.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "./icon.png",
+      "src": "/squarefit/icon.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
   "share_target": {
-    "action": "./index.html",
+    "action": "/squarefit/index.html",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {
