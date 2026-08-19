@@ -10,13 +10,13 @@
   "icons": [
     {
       "src": "https://antonpfaller.github.io/squarefit/icon.png",
-      "sizes": "2048x2048",
+      "sizes": "192x192 512x512 2048x2048",
       "type": "image/png",
       "purpose": "any"
     },
     {
       "src": "https://antonpfaller.github.io/squarefit/icon.png",
-      "sizes": "2048x2048",
+      "sizes": "192x192 512x512 2048x2048",
       "type": "image/png",
       "purpose": "maskable"
     }
