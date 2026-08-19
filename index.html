@@ -169,7 +169,7 @@
     // Service Worker für PWA und Teilen-Menü registrieren
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
+    navigator.serviceWorker.register('/squarefit/sw.js', { scope: '/squarefit/' })
       .then(reg => console.log('SW registriert:', reg))
       .catch(err => console.error('SW Fehler:', err));
   });
