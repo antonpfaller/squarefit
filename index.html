@@ -166,14 +166,14 @@
       }
     });
 
-    // Service Worker für PWA und Teilen-Menü registrieren
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/squarefit/sw.js', { scope: '/squarefit/' })
-      .then(reg => console.log('SW registriert:', reg))
-      .catch(err => console.error('SW Fehler:', err));
-  });
-}
+// Service Worker für PWA und Teilen-Menü registrieren
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('https://antonpfaller.github.io/squarefit/sw.js', { scope: 'https://antonpfaller.github.io/squarefit/' })
+          .then(reg => console.log('SW registriert:', reg))
+          .catch(err => console.error('SW Fehler:', err));
+      });
+    }
   </script>
 </body>
 </html>
