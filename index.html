@@ -7,14 +7,14 @@
       box.id = 'debug-box';
       box.style = 'position:fixed;bottom:0;left:0;right:0;background:rgba(200,0,0,0.9);color:white;padding:10px;font-size:12px;z-index:99999;word-break:break-all;max-height:40%;overflow:auto;';
       box.innerText += '\nFehler: ' + e.message + ' (Zeile: ' + e.lineno + ')';
-      document.body.appendChild(box);
+      (document.body || document.documentElement).appendChild(box);
     });
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="manifest" href="/squarefit/manifest.json">
-  <link rel="icon" type="image/png" href="https://antonpfaller.github.io/squarefit/icon.png">
-  <link rel="apple-touch-icon" href="https://antonpfaller.github.io/squarefit/icon.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
   <meta name="theme-color" content="#121212">
   <title>Werkzeug zum Export von Bildern in ein quadratisches Seitenverhältnis (Anton Pfaller)</title>
   <style>
@@ -101,10 +101,14 @@
   </div>
 
   <script>
-    // Service Worker registrieren
+    // Service Worker für PWA, Offline-Betrieb und Teilen-Menü registrieren
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js');
+      navigator.serviceWorker.register('./sw.js')
+        .catch(err => console.error('SW Fehler:', err));
     }
+
+    // Größere Bilder werden verkleinert, damit Handys nicht an Speichergrenzen scheitern
+    const MAX_SIZE = 4096;
 
     const imageInput = document.getElementById('imageInput');
     const canvas = document.getElementById('canvas');
@@ -116,8 +120,13 @@
     function processImageFile(file) {
       if (!file) return;
       const img = new Image();
+      const imgUrl = URL.createObjectURL(file);
       img.onload = () => {
-        const size = Math.max(img.width, img.height);
+        URL.revokeObjectURL(imgUrl);
+        const scale = Math.min(1, MAX_SIZE / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const size = Math.max(w, h);
         canvas.width = size;
         canvas.height = size;
 
@@ -126,14 +135,18 @@
         ctx.fillRect(0, 0, size, size);
 
         // Bild zentrieren
-        const x = (size - img.width) / 2;
-        const y = (size - img.height) / 2;
-        ctx.drawImage(img, x, y);
+        const x = (size - w) / 2;
+        const y = (size - h) / 2;
+        ctx.drawImage(img, x, y, w, h);
 
         canvas.style.display = 'block';
 
         canvas.toBlob((blob) => {
           currentBlob = blob;
+          // Alte Bild-Adresse freigeben, bevor eine neue erzeugt wird
+          if (downloadLink.href.startsWith('blob:')) {
+            URL.revokeObjectURL(downloadLink.href);
+          }
           downloadLink.href = URL.createObjectURL(blob);
           downloadLink.style.display = 'inline-flex';
           if (navigator.canShare) {
@@ -141,11 +154,17 @@
           }
         }, 'image/jpeg', 1.0);
       };
-      img.src = URL.createObjectURL(file);
+      img.onerror = () => {
+        URL.revokeObjectURL(imgUrl);
+        alert('Das Bild konnte nicht geladen werden.');
+      };
+      img.src = imgUrl;
     }
 
     imageInput.addEventListener('change', (e) => {
       processImageFile(e.target.files[0]);
+      // Zurücksetzen, damit dasselbe Bild erneut gewählt werden kann
+      e.target.value = '';
     });
 
     // Prüfen, ob die App über das Android-Teilen-Menü geöffnet wurde
@@ -176,15 +195,6 @@
         }
       }
     });
-
-// Service Worker für PWA und Teilen-Menü registrieren
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('https://antonpfaller.github.io/squarefit/sw.js', { scope: 'https://antonpfaller.github.io/squarefit/' })
-          .then(reg => console.log('SW registriert:', reg))
-          .catch(err => console.error('SW Fehler:', err));
-      });
-    }
   </script>
 </body>
 </html>
